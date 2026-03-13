@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>Word Counter - Multitools.click</title>
+
+<meta name="description" content="Free online word counter tool to count words and characters instantly.">
+
+<link rel="stylesheet" href="/style.css">
+
+</head>
+
+<body>
+
+<h1>Word Counter</h1>
+
+<textarea id="text" rows="10" style="width:100%" placeholder="Paste text here"></textarea>
+
+<br><br>
+
+<button onclick="countWords()">Count</button>
+
+<p id="result"></p>
+
+<script>
+
+function countWords(){
+
+let text=document.getElementById("text").value;
+
+let words=text.trim().split(/\s+/).filter(function(word){return word.length>0});
+
+let characters=text.length;
+
+document.getElementById("result").innerHTML=
+"Words: "+words.length+"<br>Characters: "+characters;
+
+}
+
+</script>
+
+</body>
+</html>
