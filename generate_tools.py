@@ -2,75 +2,55 @@ import json
 import os
 from collections import defaultdict
 
-# load data
+# Load data
 with open("tools-data.json") as f:
     tools = json.load(f)
 
-# load template
+# Load templates
 with open("template.html") as f:
-    template = f.read()
+    tool_template = f.read()
+with open("template_index.html") as f:
+    index_template = f.read()
 
-# create category grouping
+# Organize by category
 categories = defaultdict(list)
-
 for tool in tools:
     categories[tool["category"]].append(tool)
 
-# ensure tools folder exists
+# 1. Generate Tool Pages (The Fix)
 os.makedirs("tools", exist_ok=True)
-
-for category, items in categories.items():
-
-    category_path = f"tools/{category}"
+for tool in tools:
+    # Create specific paths based on category
+    category_path = f"tools/{tool['category']}"
     os.makedirs(category_path, exist_ok=True)
+    
+    # Generate related tools list for SEO internal linking
+    related_html = ""
+    for related in categories[tool['category']][:5]: # Top 5 related
+        if related['slug'] != tool['slug']:
+            related_html += f'<li><a href="/{category_path}/{related["slug"]}.html">{related["name"]}</a></li>\n'
 
-    for tool in items:
+    html = tool_template.replace("{tool_name}", tool["name"])
+    html = html.replace("{description}", tool["description"])
+    html = html.replace("{related_tools}", related_html)
+    
+    # Important: Add the specific JS/Logic placeholder
+    # html = html.replace("{tool_logic}", tool.get("logic_code", "")) 
 
-        related_html = ""
+    with open(f"{category_path}/{tool['slug']}.html", "w", encoding="utf-8") as f:
+        f.write(html)
 
-        for related in items[:5]:
-            related_html += f'<li><a href="/tools/{category}/{related["slug"]}.html">{related["name"]}</a></li>'
-
-        html = template.replace("{tool_name}", tool["name"])
-        html = html.replace("{description}", tool["description"])
-        html = html.replace("{related_tools}", related_html)
-
-        filename = f"{category_path}/{tool['slug']}.html"
-
-        with open(filename, "w", encoding="utf-8") as f:
-            f.write(html)
-
-        print("Created:", filename)
-
-# create category index pages
-for category, items in categories.items():
-
+# 2. Generate Homepage (The Automation)
+category_html = ""
+for cat, items in categories.items():
     links = ""
+    for item in items:
+        # Correct relative path
+        links += f'<li><a href="tools/{cat}/{item["slug"]}.html">{item["name"]}</a></li>\n'
+    category_html += f"<h2>{cat.title()}</h2><ul>{links}</ul>"
 
-    for tool in items:
-        links += f'<li><a href="/tools/{category}/{tool["slug"]}.html">{tool["name"]}</a></li>'
+index_html = index_template.replace("{categories_block}", category_html)
+with open("index.html", "w", encoding="utf-8") as f:
+    f.write(index_html)
 
-    category_page = f"""
-<!DOCTYPE html>
-<html>
-<head>
-<title>{category.title()} Tools - Multitools.click</title>
-</head>
-<body>
-
-<h1>{category.title()} Tools</h1>
-
-<ul>
-{links}
-</ul>
-
-<a href="/">Back to Home</a>
-
-</body>
-</html>
-"""
-
-    with open(f"tools/{category}/index.html", "w") as f:
-        f.write(category_page)
-
-    print("Created category page:", category)
+print("Site generated successfully.")
