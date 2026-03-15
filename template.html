@@ -1,38 +1,14 @@
-<!DOCTYPE html>
-<html>
-<head>
-
-<title>{tool_name} - Multitools.click</title>
-
-<meta name="description" content="{description}">
-
-<link rel="stylesheet" href="/style.css">
-
-</head>
-
-<body>
-
-<h1>{tool_name}</h1>
-
-<p>{description}</p>
-
-<div id="tool-area">
-
-<!-- TOOL UI PLACEHOLDER -->
-
-<textarea placeholder="Tool input"></textarea>
-
-<button>Run Tool</button>
-
-</div>
-
-<h3>Related Tools</h3>
-
-<ul>
-{related_tools}
-</ul>
-
-<a href="/">Back to Home</a>
-
-</body>
-</html>
+<script>
+    // Generic Copy Function
+    function copyOutput() {
+        const text = document.getElementById('output').innerText;
+        navigator.clipboard.writeText(text).then(() => alert('Copied!'));
+    }
+    // Generic Download Function
+    function downloadOutput(filename, text) {
+        const el = document.createElement('a');
+        el.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+        el.setAttribute('download', filename);
+        el.click();
+    }
+</script>
